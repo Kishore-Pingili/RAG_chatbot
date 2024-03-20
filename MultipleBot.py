@@ -5,15 +5,13 @@ from datetime import datetime,timedelta,timezone
 from dotenv import load_dotenv
 import os
 import sqlite3
-from streamlit_feedback import streamlit_feedback
+# from streamlit_feedback import streamlit_feedback
 from streamlit_local_storage import LocalStorage
 import uuid
 import snowflake.connector as sn
 import streamlit as st
-from streamlit_js_eval import streamlit_js_eval
+# from streamlit_js_eval import streamlit_js_eval
 from nanoid import generate
-    
-
 
 
 load_dotenv()
@@ -54,28 +52,29 @@ def reactions(reaction,chats,option,flag):
     # db = rf"chatbotDb.db"
     # conn = sqlite3.connect(db)
     # cursor = conn.cursor()
-    conn=sn.connect(
-        user=os.getenv("USER"),
-        password=os.getenv("PASSWORD"),
-        role=os.getenv("ROLE"),
-        schema=os.getenv("SCHEMA"),
-        account=os.getenv("ACCOUNT"),
-        database=os.getenv("DATABASE")
-    )    
-    cursor = conn.cursor()
-    if flag == "from_chatbot":
-        query = "UPDATE logs SET reaction = %s WHERE TO_VARCHAR(timestamp) = %s"
-        parameters = (reaction, getattr(chats, f'{option.lower()}_history')[-1]['ist_time'])
-        cursor.execute(query, parameters)
+    # conn=sn.connect(
+    #     user=os.getenv("USER"),
+    #     password=os.getenv("PASSWORD"),
+    #     role=os.getenv("ROLE"),
+    #     schema=os.getenv("SCHEMA"),
+    #     account=os.getenv("ACCOUNT"),
+    #     database=os.getenv("DATABASE")
+    # )    
+    # cursor = conn.cursor()
+    # if flag == "from_chatbot":
+    #     query = "UPDATE logs SET reaction = %s WHERE TO_VARCHAR(timestamp) = %s"
+    #     parameters = (reaction, getattr(chats, f'{option.lower()}_history')[-1]['ist_time'])
+    #     cursor.execute(query, parameters)
 
-    elif flag == "from_displaychats":
-        query = "UPDATE logs SET reaction = %s WHERE TO_VARCHAR(timestamp) = %s"
-        parameters = (reaction, str(chats['ist_time']))
-        cursor.execute(query, parameters)
-        # getattr(chats,f'{option.lower()}_history')["reaction"] = reaction
+    # elif flag == "from_displaychats":
+    #     query = "UPDATE logs SET reaction = %s WHERE TO_VARCHAR(timestamp) = %s"
+    #     parameters = (reaction, str(chats['ist_time']))
+    #     cursor.execute(query, parameters)
+    #     # getattr(chats,f'{option.lower()}_history')["reaction"] = reaction
 
     
-    conn.commit()
+    # conn.commit()
+    return True
 
 def chatbot():
     st.sidebar.title("Chat Bots")
@@ -155,18 +154,18 @@ def chatbot():
         # message_id = str(uuid.uuid4())
         
         # user = LocalStorage().getItem("logs").get("logs")[1]
-        time.sleep(3)
-        conn=sn.connect(
-        user=os.getenv("USER"),
-        password=os.getenv("PASSWORD"),
-        role=os.getenv("ROLE"),
-        schema=os.getenv("SCHEMA"),
-        account=os.getenv("ACCOUNT"),
-        database=os.getenv("DATABASE")
-        ) 
-        cursor = conn.cursor()
+        # time.sleep(3)
+        # conn=sn.connect(
+        # user=os.getenv("USER"),
+        # password=os.getenv("PASSWORD"),
+        # role=os.getenv("ROLE"),
+        # schema=os.getenv("SCHEMA"),
+        # account=os.getenv("ACCOUNT"),
+        # database=os.getenv("DATABASE")
+        # ) 
+        # cursor = conn.cursor()
         
-        cursor.execute(f"INSERT INTO logs (email, question, answer, timestamp,session_id) VALUES (%s,%s,%s,%s,%s)",(st.session_state["user_email"], user_query,response_for_db,IST_time,st.session_state["session_id"]))
+        # cursor.execute(f"INSERT INTO logs (email, question, answer, timestamp,session_id) VALUES (%s,%s,%s,%s,%s)",(st.session_state["user_email"], user_query,response_for_db,IST_time,st.session_state["session_id"]))
         # cursor.execute(f"INSERT INTO logs (email, question, answer, timestamp) VALUES (%s,%s,%s,%s)",(user, user_query,response_for_db,IST_time))
         # cursor.execute(f"INSERT INTO logs (email, question, answer, timestamp) VALUES (?,?,?)",("test1", user_query,response_for_db,IST_time))
         # cursor.execute("SELECT MAX(id) FROM logs")
@@ -178,37 +177,39 @@ def chatbot():
 
 
 def LoggedIn_Clicked(userName, password):
-    conn=sn.connect(
-    user=os.getenv("USER"),
-    password=os.getenv("PASSWORD"),
-    role=os.getenv("ROLE"),
-    schema=os.getenv("SCHEMA"),
-    account=os.getenv("ACCOUNT"),
-    database=os.getenv("DATABASE")
-)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM user WHERE email = %s AND password = %s",(userName,password))
-    USER = cursor.fetchone()
-    conn.close()
-    if USER:
-        if userName == USER[1] and password == USER[2]:
-            localS = LocalStorage()
-            # localS.setItem(itemKey="session",itemValue=str(uuid.uuid4()))
-            session_id = str(uuid.uuid4())
-            # session_id = generate(size=10)
-            # print(session_id,"////////////////////")
-            localS.setItem(itemKey="logs",itemValue=[session_id,USER[1]])
+    st.session_state['loggedIn'] = True
+#     conn=sn.connect(
+#     user=os.getenv("USER"),
+#     password=os.getenv("PASSWORD"),
+#     role=os.getenv("ROLE"),
+#     schema=os.getenv("SCHEMA"),
+#     account=os.getenv("ACCOUNT"),
+#     database=os.getenv("DATABASE")
+# )
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT * FROM user WHERE email = %s AND password = %s",(userName,password))
+#     USER = cursor.fetchone()
+#     conn.close()
+#     if USER:
+#         if userName == USER[1] and password == USER[2]:
+#             localS = LocalStorage()
+#             # localS.setItem(itemKey="session",itemValue=str(uuid.uuid4()))
+#             session_id = str(uuid.uuid4())
+#             # session_id = generate(size=10)
+#             # print(session_id,"////////////////////")
+#             localS.setItem(itemKey="logs",itemValue=[session_id,USER[1]])
             
-            # if "user_email" not in st.session_state:
-            #     st.session_state["user_email"]=USER[1]
-            # if "user_id" not in st.session_state:
-            #     st.session_state["user_id"]=USER[0]
-            st.session_state['loggedIn'] = True
-        else:
-            st.session_state['loggedIn'] = False
-            st.error("Invalid user name or password")
-    else:
-        st.error("user does't exist")
+#             # if "user_email" not in st.session_state:
+#             #     st.session_state["user_email"]=USER[1]
+#             # if "user_id" not in st.session_state:
+#             #     st.session_state["user_id"]=USER[0]
+#             st.session_state['loggedIn'] = True
+#         else:
+#             st.session_state['loggedIn'] = True
+#             # st.error("Invalid user name or password")
+#     else:
+#         st.session_state['loggedIn'] = True
+#         # st.error("user does't exist")
 
 
 def show_login_page():
@@ -230,16 +231,17 @@ def show_login_page():
 # else:
 #     # show_login_page()
 
-get_token = LocalStorage().getItem("logs")
-if "user_email" not in st.session_state:
-    if get_token and get_token["storage"] and len(get_token["storage"]["value"])!=0:
-        st.session_state["user_email"]=get_token["storage"]["value"][1]
-if "session_id" not in st.session_state:
-    if get_token and get_token["storage"] and len(get_token["storage"]["value"])!=0:
-        st.session_state["session_id"]=get_token["storage"]["value"][0]
-if get_token and get_token["storage"] and len(get_token["storage"]["value"])!=0:
-    chatbot()
-else:
-    show_login_page()
+# get_token = LocalStorage().getItem("logs")
+# if "user_email" not in st.session_state:
+#     if get_token and get_token["storage"] and len(get_token["storage"]["value"])!=0:
+#         st.session_state["user_email"]=get_token["storage"]["value"][1]
+# if "session_id" not in st.session_state:
+#     if get_token and get_token["storage"] and len(get_token["storage"]["value"])!=0:
+#         st.session_state["session_id"]=get_token["storage"]["value"][0]
+# if get_token and get_token["storage"] and len(get_token["storage"]["value"])!=0:
+#     chatbot()
+# else:
+#     show_login_page()
 
+chatbot()
     
